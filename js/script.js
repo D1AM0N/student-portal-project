@@ -1,38 +1,47 @@
-// main.js
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. KEBAB DROPDOWN LOGIC
+    const userTrigger = document.getElementById('userTrigger');
+    const userDropdown = document.getElementById('userDropdown');
 
-document.addEventListener('DOMContentLoaded', () => {
+    if (userTrigger && userDropdown) {
+        userTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+        });
 
-    // --- 1. Flash messages auto-fade ---
-    const flashes = document.querySelectorAll('.flash');
-    flashes.forEach(flash => {
-        setTimeout(() => {
-            flash.style.transition = "opacity 0.5s";
-            flash.style.opacity = 0;
-            setTimeout(() => flash.remove(), 500);
-        }, 3000);
-    });
-
-    // --- 2. Live search for student table ---
-    const searchInput = document.querySelector('#search');
-    if(searchInput) {
-        searchInput.addEventListener('input', () => {
-            const term = searchInput.value.toLowerCase();
-            document.querySelectorAll('#studentTable tr').forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
-            });
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!userDropdown.contains(e.target) && !userTrigger.contains(e.target)) {
+                userDropdown.classList.remove('active');
+            }
         });
     }
 
-    // --- 3. Custom delete confirmation ---
-    const deleteLinks = document.querySelectorAll('.btn-delete');
-    deleteLinks.forEach(link => {
-        link.addEventListener('click', e => {
-            const nameCell = link.closest('tr').querySelector('td:nth-child(2)');
-            const name = nameCell ? nameCell.innerText : 'this student';
-            if(!confirm(`Are you sure you want to delete student: ${name}?`)) {
-                e.preventDefault(); // cancel deletion
-            }
-        });
+    // 2. AUTO-HIDE FLASH MESSAGES
+    const flashMessages = document.querySelectorAll('.flash-msg');
+    flashMessages.forEach(msg => {
+        setTimeout(() => {
+            msg.style.opacity = '0';
+            msg.style.transform = 'translateY(-10px)';
+            msg.style.transition = '0.5s ease';
+            setTimeout(() => msg.remove(), 500);
+        }, 4000); // Hides after 4 seconds
     });
-
 });
+
+// 3. COPY URL FUNCTION
+function copyUrl() {
+    const el = document.createElement('textarea');
+    el.value = window.location.href;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    
+    // Alert replacement (more modern)
+    const toast = document.createElement('div');
+    toast.innerHTML = "Link Copied!";
+    toast.style = "position:fixed; bottom:20px; right:20px; background:#1e293b; color:white; padding:10px 20px; border-radius:8px; z-index:100000;";
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+}
